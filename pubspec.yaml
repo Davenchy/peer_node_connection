@@ -1,5 +1,6 @@
 name: peer_node_connection
 description: A peer to peer node connection
+repository: https://github.com/Davenchy/peer_node_connection
 version: 1.0.0
 
 environment:
