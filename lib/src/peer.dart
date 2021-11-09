@@ -67,12 +67,12 @@ class Peer extends TypedEventEmitter<PeerEvent> {
     sub = _socket!.listen(
       _onData,
       onError: _onError,
-      onDone: () {
+      onDone: () async {
         emit(const PeerEvent.onDisconnect());
-        _socket?.flush();
+        await _socket?.flush();
         _socket?.close();
         _socket = null;
-        sub.cancel();
+        await sub.cancel();
       },
     );
   }
@@ -171,17 +171,20 @@ class Peer extends TypedEventEmitter<PeerEvent> {
   }
 
   /// flush data, disconnect peer and close socket then clear memory
-  Future<void> disconnect() async {
-    await _socket?.flush();
-    _socket?.destroy();
-  }
+  ///
+  /// you can reconnect again after disconnecting instead call `destroy`
+  /// to full memory cleanup
+  void disconnect() => _socket?.destroy();
 
   /// destroy the current peer connection
   ///
-  /// call `disconnect` and wait the clear all event handlers from memory
+  /// calls `disconnect`
+  /// then full memory cleanup
+  ///
+  /// you cannot reconnect after calling this method
   @override
   Future<void> destroy() async {
-    await disconnect();
+    disconnect();
     return super.destroy();
   }
 
